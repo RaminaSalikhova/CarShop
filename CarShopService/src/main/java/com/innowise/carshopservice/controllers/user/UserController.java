@@ -11,9 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -66,6 +68,24 @@ public class UserController {
 
         final String token = jwtTokenUtil.generateToken(userDetails);
         return ResponseEntity.ok(new AuthToken(token, userDetails.getRole().toString(), userDetails.getUserId()));
+    }
+
+    @PreAuthorize("hasRole('admin')")
+    @PostMapping(value = "/user/deleteUserById/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity deleteUser(@PathVariable Long id) {
+        userService.softDelete(id);
+        return new ResponseEntity<>("Successful operation", HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('admin')")
+    @GetMapping("/user/getAll")
+    public List<User> findAll() {
+        return userService.findAll();
+    }
+
+    @GetMapping(value = "/user/{userId}")
+    public User getUserById(@PathVariable("userId") Long id) {
+        return  userService.findById(id);
     }
 
 }

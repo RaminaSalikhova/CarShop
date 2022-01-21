@@ -60,4 +60,9 @@ public class UserService {
         }
         return u.get();
     }
+
+    @Transactional
+    public void softDelete(Long id) {
+        repo.softDelete(id);
+    }
 }
