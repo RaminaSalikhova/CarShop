@@ -1,11 +1,11 @@
 package com.innowise.carshopservice.repositories.user;
 
 import com.innowise.carshopservice.models.User;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.innowise.carshopservice.repositories.CommonRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-public interface UserRepo extends JpaRepository<User, Long> {
+public interface UserRepo extends CommonRepository<User> {
     User findUserByEmail(String email);
 
     @Modifying

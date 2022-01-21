@@ -3,6 +3,8 @@ package com.innowise.carshopservice.controllers.user;
 import com.innowise.carshopservice.dto.user.AuthToken;
 import com.innowise.carshopservice.dto.user.CreateUserDto;
 import com.innowise.carshopservice.dto.user.LoginUserDto;
+import com.innowise.carshopservice.enums.user.ACCOUNT_ACTIVITY_STATUS;
+import com.innowise.carshopservice.enums.user.ROLE_ENUM;
 import com.innowise.carshopservice.models.User;
 import com.innowise.carshopservice.security.jwt.JwtTokenHelper;
 import com.innowise.carshopservice.services.user.UserService;
@@ -54,7 +56,11 @@ public class UserController {
         if(user.getPassword().length()<5){
             return new ResponseEntity<>("Password should have at least 5 symbols", HttpStatus.BAD_REQUEST);
         }
-        userService.createUser(user);
+        String pass=bCryptPasswordEncoder.encode(user.getPassword());
+        user.setPassword(pass);
+        user.setAccountActivityStatus(ACCOUNT_ACTIVITY_STATUS.active);
+        user.setRole(ROLE_ENUM.user);
+        userService.save(user);
         return new ResponseEntity<>("Successful operation", HttpStatus.OK);
     }
 
