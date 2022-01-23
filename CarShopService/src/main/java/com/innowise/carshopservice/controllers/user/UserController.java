@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
@@ -50,6 +51,9 @@ public class UserController {
     public ResponseEntity registerUser(@RequestBody CreateUserDto createUserDto) {
         User user = modelMapper.map(createUserDto, User.class);
         Optional<User> existedUser = userService.findUserByEmail(user.getEmail());
+        if(!validateEmail(createUserDto.getEmail())){
+            return new ResponseEntity<>("The email view should be 'email@mail.com' view ", HttpStatus.BAD_REQUEST);
+        }
         if (existedUser.isPresent()) {
             return new ResponseEntity<>("The email already exists", HttpStatus.BAD_REQUEST);
         }
@@ -94,4 +98,8 @@ public class UserController {
         return  userService.findById(id);
     }
 
+    public static boolean validateEmail(String email) {
+        Pattern pattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        return pattern.matcher(email).matches() ? true : false;
+    }
 }
