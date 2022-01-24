@@ -4,12 +4,8 @@ import com.innowise.carshopservice.enums.car.CAR_STATE;
 import com.innowise.carshopservice.enums.cost.CURRENCY;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class UpdateAdvertisementDto {
-    private Long advertisementId;
-
     private Long carId;
     private String mark;
     private String model;

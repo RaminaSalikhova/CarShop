@@ -8,6 +8,7 @@ import com.innowise.carshopservice.enums.user.ROLE_ENUM;
 import com.innowise.carshopservice.models.User;
 import com.innowise.carshopservice.security.jwt.JwtTokenHelper;
 import com.innowise.carshopservice.services.user.UserService;
+import com.innowise.carshopservice.utils.ValidationUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 
@@ -32,7 +32,7 @@ public class UserController {
     private ModelMapper modelMapper;
 
     @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     private JwtTokenHelper jwtTokenUtil;
@@ -45,13 +45,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping(value = "/user/register",
+    @PostMapping(value = "/users/register",
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity registerUser(@RequestBody CreateUserDto createUserDto) {
         User user = modelMapper.map(createUserDto, User.class);
         Optional<User> existedUser = userService.findUserByEmail(user.getEmail());
-        if(!validateEmail(createUserDto.getEmail())){
+        if(!ValidationUtil.validateEmail(createUserDto.getEmail())){
             return new ResponseEntity<>("The email view should be 'email@mail.com' view ", HttpStatus.BAD_REQUEST);
         }
         if (existedUser.isPresent()) {
@@ -68,7 +68,7 @@ public class UserController {
         return new ResponseEntity<>("Successful operation", HttpStatus.OK);
     }
 
-    @PostMapping(value = "/user/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/users/login", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity loginUser(@RequestBody LoginUserDto authenticationRequest) {
         final User userDetails = userService.loadUserByUsername(authenticationRequest.getEmail());
 
@@ -81,25 +81,20 @@ public class UserController {
     }
 
     @PreAuthorize("hasRole('admin')")
-    @PostMapping(value = "/user/deleteUserById/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity deleteUser(@PathVariable Long id) {
         userService.softDelete(id);
         return new ResponseEntity<>("Successful operation", HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('admin')")
-    @GetMapping("/user/getAll")
+    @GetMapping("/users/")
     public List<User> findAll() {
         return userService.findAll();
     }
 
-    @GetMapping(value = "/user/{userId}")
+    @GetMapping(value = "/users/{userId}")
     public User getUserById(@PathVariable("userId") Long id) {
         return  userService.findById(id);
-    }
-
-    public static boolean validateEmail(String email) {
-        Pattern pattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(email).matches() ? true : false;
     }
 }

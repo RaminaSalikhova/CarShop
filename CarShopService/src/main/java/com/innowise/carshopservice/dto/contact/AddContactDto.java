@@ -5,5 +5,4 @@ import lombok.Data;
 @Data
 public class AddContactDto {
     private String number;
-    private Long advertisementId;
 }

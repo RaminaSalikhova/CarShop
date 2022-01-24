@@ -1,5 +1,6 @@
 package com.innowise.carshopservice.models;
 
+import com.innowise.carshopservice.enums.photo.ACTIVITY_STATUS;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,4 +24,8 @@ public class Photo {
     @ManyToOne
     @JoinColumn(name = "carid")
     private Car car;
+
+    @Column(name = "activitystatus")
+    @Enumerated(EnumType.STRING)
+    private ACTIVITY_STATUS activityStatus;
 }

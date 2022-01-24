@@ -15,11 +15,11 @@ public class ContactService extends CommonServiceImpl<Contact, ContactRepo> {
         super(repo);
     }
 
-    public List<Contact> findByAdvertisement_AdvertisementId (Long advertisementId) {
+    public List<Contact> findByAdvertisementId (Long advertisementId) {
         return repo.findAllByAdvertisement_AdvertisementId(advertisementId);
     }
 
-    public List<Contact> findAllByAdvertisement_AdvertisementIdAndActivityStatus_Active (Long advertisementId) {
+    public List<Contact> findAllByAdvertisementId (Long advertisementId) {
         return repo.findAllByAdvertisement_AdvertisementIdAndActivityStatus(advertisementId, ACTIVITY_STATUS.active);
     }
 
