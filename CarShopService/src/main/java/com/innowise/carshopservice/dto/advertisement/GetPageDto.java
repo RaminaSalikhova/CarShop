@@ -9,5 +9,5 @@ import java.util.List;
 @Data
 public class GetPageDto {
     private List<GetAdvertisementDto> getAdvertisementDto;
-    private int total;
+    private long total;
 }
