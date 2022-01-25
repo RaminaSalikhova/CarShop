@@ -35,8 +35,9 @@ public abstract class CommonServiceImpl<E, R extends CommonRepository<E>> implem
 
     @Override
     @Transactional
-    public void save(E entity) {
+    public E save(E entity) {
          entityManger.persist(entity);
+         return entity;
     }
 
     @Override

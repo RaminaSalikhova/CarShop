@@ -6,7 +6,7 @@ import java.util.List;
 public interface CommonService<E> {
     List<E> findAll();
 
-    void save(E entity);
+    E save(E entity);
 
     E update(E entity);
 
