@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +75,7 @@ public class PhotoController {
         if (photo.isPresent()) {
             try {
                 File file = new File(path);
-                byteImage = FileUtils.readFileToByteArray(file);
+                byteImage = Base64.getEncoder().encode(FileUtils.readFileToByteArray(file));
                 return byteImage;
             } catch (IOException exception) {
                 exception.printStackTrace();
