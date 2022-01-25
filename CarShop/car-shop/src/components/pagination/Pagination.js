@@ -8,7 +8,7 @@ const Pagination = () => {
 
     const [totalRecords, setTotalRecords] = useState(0);
     const [data, setData] = useState([]);
-    const [limit, setLimit] = useState(2);
+    const [limit, setLimit] = useState(3);
 
     const [reload, setReloading] = useState(false);
 
@@ -17,8 +17,7 @@ const Pagination = () => {
     }, []);
 
     async function fetchData(page) {
-        let pathLimit = limit + 2;
-        let url = "http://localhost:8082/carshop/advertisements/?page=" + page + "&size=" + pathLimit;
+        let url = "http://localhost:8082/carshop/advertisements/?page=" + page + "&size=" + limit;
         console.log('uri>>', url);
 
         const response = await axios.get(url)

@@ -5,7 +5,7 @@ import Pagination from "../pagination/Pagination"
 import Login from "../login/Login";
 import Registration from "../login/Registration";
 
-const CustomTabs = () => {
+const CustomTabs = (props) => {
     return (
         <div>
             <Tabs  id="uncontrolled-tab-example" className="mb-3">
@@ -13,10 +13,10 @@ const CustomTabs = () => {
                     <Pagination/>
                 </Tab>
                 <Tab eventKey="SignIn" title="Sign in">
-                    <Login/>
+                    <Login history={props.history}/>
                 </Tab>
                 <Tab eventKey="SignUp" title="Sign up">
-                    <Registration/>
+                    <Registration history={props.history}/>
                 </Tab>
             </Tabs>
         </div>
