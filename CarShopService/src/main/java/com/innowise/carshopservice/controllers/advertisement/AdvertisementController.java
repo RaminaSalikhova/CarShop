@@ -67,6 +67,7 @@ public class AdvertisementController {
         }else {
             allAdvertisements = advertisementService.filtration(pageable, filtrationValue.get());
         }
+        long advertisementsTotalCount = allAdvertisements.getTotalElements();
 
         List<GetAdvertisementDto> activeAdvertisements = new ArrayList<>();
         for (Advertisement advertisement : allAdvertisements) {
@@ -80,7 +81,8 @@ public class AdvertisementController {
                 getAdvertisementDto.setContact(numbers);
                 activeAdvertisements.add(getAdvertisementDto);
         }
-        GetPageDto getPageDto=new GetPageDto(activeAdvertisements, allAdvertisements.getContent().size());
+
+        GetPageDto getPageDto=new GetPageDto(activeAdvertisements, advertisementsTotalCount);
         return getPageDto;
     }
 
