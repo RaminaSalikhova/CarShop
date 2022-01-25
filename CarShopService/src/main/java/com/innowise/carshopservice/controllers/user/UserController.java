@@ -2,6 +2,7 @@ package com.innowise.carshopservice.controllers.user;
 
 import com.innowise.carshopservice.dto.user.AuthToken;
 import com.innowise.carshopservice.dto.user.CreateUserDto;
+import com.innowise.carshopservice.dto.user.GetUserDto;
 import com.innowise.carshopservice.dto.user.LoginUserDto;
 import com.innowise.carshopservice.enums.user.ACCOUNT_ACTIVITY_STATUS;
 import com.innowise.carshopservice.enums.user.ROLE_ENUM;
@@ -18,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,12 +91,17 @@ public class UserController {
 
     @PreAuthorize("hasRole('admin')")
     @GetMapping("/users/")
-    public List<User> findAll() {
-        return userService.findAll();
+    public List<GetUserDto> findAll() {
+        List<User> users=userService.findAllActiveAccounts();
+        List<GetUserDto> getUserDtos = new ArrayList<>();
+        for(User user: users){
+            getUserDtos.add(modelMapper.map(user, GetUserDto.class));
+        }
+        return getUserDtos;
     }
 
     @GetMapping(value = "/users/{userId}")
-    public User getUserById(@PathVariable("userId") Long id) {
-        return  userService.findById(id);
+    public GetUserDto getUserById(@PathVariable("userId") Long id) {
+        return modelMapper.map(userService.findById(id), GetUserDto.class);
     }
 }

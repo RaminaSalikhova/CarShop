@@ -6,6 +6,7 @@ import com.innowise.carshopservice.security.jwt.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -52,7 +53,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeRequests().antMatchers("/carshop/user/login", "/carshop/user/register", "/carshop/allAdvertisement", "/swagger*/**","/v2/api-docs", "/configuration/**", "/webjars/**").permitAll()
+                .authorizeRequests().antMatchers("/carshop/users/login", "/carshop/users/register", "/swagger*/**","/v2/api-docs", "/configuration/**", "/webjars/**").permitAll()
+                .and().authorizeRequests().antMatchers(HttpMethod.GET, "/carshop/advertisements/").permitAll()
+                .and().authorizeRequests().antMatchers(HttpMethod.GET, "/carshop/users/{^[\\\\d]$}").permitAll()
+                .and().authorizeRequests().antMatchers(HttpMethod.GET, "/carshop/advertisements/{^[\\\\d]$}/contacts/").permitAll()
+                .and().authorizeRequests().antMatchers(HttpMethod.GET, "/carshop/cars/{^[\\\\d]$}/photos/").permitAll()
+                .and().authorizeRequests().antMatchers(HttpMethod.GET, "/carshop/photos/{[a-zA-Z]*[0-9]*.(jpg|png|gif|bmp)}/").permitAll()
                 .anyRequest().authenticated().and()
                 .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

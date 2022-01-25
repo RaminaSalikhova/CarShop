@@ -65,7 +65,7 @@ public class PhotoController {
         return photoService.findAllByActivityStatusAndCarId(carId);
     }
 
-    @GetMapping(value = "/photos/{filename}",
+    @GetMapping(value = "/photos/{filename}/",
             produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] getPhotoByPath(@PathVariable("filename") String filename) {
         String path="C:\\Users\\Administrator\\Desktop\\TEST\\Photos\\" +filename;
