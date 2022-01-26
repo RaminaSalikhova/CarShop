@@ -1,64 +1,109 @@
 import React, {useEffect, useState} from 'react';
+import {Card, Modal} from "react-bootstrap";
 import axios from "axios";
-import AdvertisementItem from "./AdvertisementItem";
-import {Modal} from "react-bootstrap";
-import Carousel from "react-bootstrap/Carousel";
-import {Formik, Field, ErrorMessage} from "formik";
+import {Formik} from "formik";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import * as yup from "yup";
+import ContactItem from "./ContactItem";
 
-const UserHome = () => {
 
-    const [advertisements, setAdvertisements] = useState([]);
+const AdvertisementItem = (props) => {
     const [show, setShow] = useState(false);
+
+    const [reloadList, setReloadingList] = useState(false);
 
     const handleClose = () => setShow(false);
     const handleShow = async () => {
         setShow(true);
+        console.log(props.advertisement.car)
     }
 
-    const [reloadList, setReloadingList] = useState(false);
+    const [showContacts, setShowContacts] = useState(false);
 
-    useEffect(async () => {
-        await fetchAdvertisements();
-    }, [reloadList]);
+    const handleCloseContacts = () => setShowContacts(false);
+    const handleShowContacts = async () => {
+        setShowContacts(true);
+        fetchContacts();
+    }
 
-    async function fetchAdvertisements() {
-        let url = "http://localhost:8082/carshop/users/" + sessionStorage.getItem("userId") + "/advertisements/"
+    const [contacts, setContacts] = useState([]);
+
+    async function fetchContacts() {
+        let url = "http://localhost:8082/carshop/advertisements/" + props.advertisement.advertisementId + "/contacts/"
         const response = await axios.get(url, {
             headers: {
                 "Authorization": `Bearer ${sessionStorage.getItem("token")}`
             }
         });
         console.log(response.data);
-        setAdvertisements(response.data);
+        setContacts(response.data);
+        setReloadingList(!reloadList);
     }
 
-    async function postAdvertisements(obj) {
-        let url = "http://localhost:8082/carshop/advertisements/"
+    async function postContact(obj) {
+        let url = "http://localhost:8082/carshop/advertisements/"+ props.advertisement.advertisementId+"/contacts/";
         const response = await axios.post(url, obj, {
             headers: {
                 "Authorization": `Bearer ${sessionStorage.getItem("token")}`
             }
         });
-        // setAdvertisements(response.data);
+        props.setReloadingList(!props.currentReloadState);
+        setReloadingList(!reloadList);
     }
 
-    const handleAdd = (e) => {
+
+    async function deleteAdvertisement() {
+        let url = "http://localhost:8082/carshop/advertisements/" + props.advertisement.advertisementId;
+        const response = await axios.delete(url, {
+            headers: {
+                "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+            }
+        });
+        props.setReloadingList(!props.currentReloadState);
+
+    }
+
+    async function updateAdvertisement(obj) {
+        let url = "http://localhost:8082/carshop/advertisements/" + props.advertisement.advertisementId;
+        const response = await axios.put(url, obj, {
+            headers: {
+                "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+            }
+        })
+        console.log(response.data)
+        props.setReloadingList(!props.currentReloadState);
+    }
+
+    const handleEdit = (e) => {
         let obj = {
+            carId: props.advertisement.car.carId,
             mark: e.mark,
             model: e.model,
             yearofproduction: e.yearofproduction,
             state: e.state,
             mileage: e.mileage,
+            costId: props.advertisement.cost.costId,
             value: e.cost,
             currency: e.currency,
-            userId:sessionStorage.getItem("userId")
+            userId: sessionStorage.getItem("userId"),
         };
         console.log(obj)
-        postAdvertisements(obj);
+        updateAdvertisement(obj);
     }
+    const phoneRegExp = /^\+375(17|29|33|44)[0-9]{3}[0-9]{2}[0-9]{2}$/
+
+    const handleAddContact = (e) => {
+        const obj={
+            number:e.phoneNumber,
+        }
+        console.log(obj);
+        postContact(obj);
+    }
+
+    const schemaContacts = yup.object().shape({
+        phoneNumber: yup.string().matches(phoneRegExp, 'Phone number is not valid'),
+    });
 
     const schema = yup.object().shape({
         mark: yup.string().required("Fill mark!"),
@@ -106,24 +151,31 @@ const UserHome = () => {
         {value: "2022", label: "2022"}
     ];
 
+    console.log(props);
+
     return (
         <div>
-            <h1>Hi, User</h1>
-            <button onClick={handleShow} type="button" className="btn btn-dark" style={{margin: "3.5%"}}>Add
-                advertisement
-            </button>
+            <Card style={{width: '90%', margin: '3%'}}>
+                <Card.Body>
+                    <Card.Title>
+                        <div>{props.advertisement.car.mark}</div>
+                        <div>{props.advertisement.car.model}</div>
+                    </Card.Title>
+                    <Card.Text>
+                        <div>Cost: {props.advertisement.cost.value} - {props.advertisement.cost.currency}</div>
 
-            <h4 className="h4">Your advertisements</h4>
-            {advertisements.map(advertisement =>
-                advertisement.activityStatus=="deactivated"
-                    ? null
-                    :
-                <AdvertisementItem key={advertisement.advertisementId}
-                                                                    token={sessionStorage.getItem("token")}
-                                                                    advertisement={advertisement}
-                                                                    setReloadingList={setReloadingList}
-                                                                    currentReloadState={reloadList}
-            />)}
+                    </Card.Text>
+                </Card.Body>
+                <button onClick={handleShow} type="button" className="btn btn-dark" style={{margin: "1%"}}>Edit
+                    advertisement
+                </button>
+                <button onClick={deleteAdvertisement} type="button" className="btn btn-dark"
+                        style={{margin: "1%"}}>Delete advertisement
+                </button>
+                <button onClick={handleShowContacts} type="button" className="btn btn-dark" style={{margin: "1%"}}>Your
+                    contacts
+                </button>
+            </Card>
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
@@ -131,16 +183,16 @@ const UserHome = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <Formik
-                        onSubmit={handleAdd}
+                        onSubmit={handleEdit}
                         validationSchema={schema}
                         initialValues={{
-                            mark: "",
-                            model: "",
-                            yearofproduction: "",
-                            state: "",
-                            mileage: 0,
-                            cost: 0,
-                            currency: ""
+                            mark: props.advertisement.car.mark,
+                            model: props.advertisement.car.model,
+                            yearofproduction: props.advertisement.car.yearOfProduction,
+                            state: props.advertisement.car.state,
+                            mileage: props.advertisement.car.mileage,
+                            cost: props.advertisement.cost.value,
+                            currency: props.advertisement.cost.currency,
                         }}
                         render={({
                                      handleSubmit,
@@ -179,6 +231,7 @@ const UserHome = () => {
                                         <Form.Label>Select year of production</Form.Label>
                                         <Form.Control as="select"
                                                       onChange={handleChange}
+                                                      value={values.yearofproduction}
                                                       name="yearofproduction"
                                                       isValid={touched.yearofproduction && !errors.yearofproduction}>
                                             <option>Open this select menu</option>
@@ -190,7 +243,8 @@ const UserHome = () => {
                                         </Form.Control>
 
                                         {errors.yearofproduction && touched.yearofproduction ? (
-                                            <div className="error" style={{color:"red"}}>{errors.yearofproduction}</div>) : null}
+                                            <div className="error"
+                                                 style={{color: "red"}}>{errors.yearofproduction}</div>) : null}
                                     </Form.Group>
 
                                     <Form.Group className="mb-3" controlId="state">
@@ -198,6 +252,7 @@ const UserHome = () => {
                                         <Form.Control as="select"
                                                       onChange={handleChange}
                                                       name="state"
+                                                      value={values.state}
                                                       isValid={touched.state && !errors.state}>
                                             <option>Open this select menu</option>
                                             <option value={"withMileage"}>with mileage</option>
@@ -206,7 +261,7 @@ const UserHome = () => {
                                             <option value={"unused"}>with unused</option>
                                         </Form.Control>
                                         {errors.state && touched.state ? (
-                                            <div className="error" style={{color:"red"}}>{errors.state}</div>) : null}
+                                            <div className="error" style={{color: "red"}}>{errors.state}</div>) : null}
                                     </Form.Group>
 
                                     <Form.Group className="mb-3" controlId="mileage">
@@ -238,15 +293,17 @@ const UserHome = () => {
                                         <Form.Label>Select currency</Form.Label>
                                         <Form.Control as="select"
                                                       onChange={handleChange}
+                                                      value={values.currency}
                                                       name="currency"
                                                       isValid={touched.currency && !errors.currency}>
                                             <option>Open this select menu</option>
                                             <option value={"EUR"}>EUR</option>
-                                            <option value={"BYR"}>BYR</option>
+                                            <option value={"BYN"}>BYN</option>
                                             <option value={"USD"}>USD</option>
                                         </Form.Control>
                                         {errors.currency && touched.currency ? (
-                                            <div className="error" style={{color:"red"}}>{errors.currency}</div>) : null}
+                                            <div className="error"
+                                                 style={{color: "red"}}>{errors.currency}</div>) : null}
                                     </Form.Group>
 
                                     <Button type="submit">
@@ -257,8 +314,58 @@ const UserHome = () => {
                     </Formik>
                 </Modal.Body>
             </Modal>
+
+
+            <Modal show={showContacts} onHide={handleCloseContacts}>
+                <Modal.Header closeButton>
+                    <Modal.Title>More about</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <h4 className="h4">Your contacts</h4>
+                    {contacts.map(contact =>
+                        <ContactItem contact={contact}
+                                     setReloadingList={setReloadingList}
+                                     currentReloadState={reloadList}
+                        ></ContactItem>
+                    )}
+                    <Formik
+                        onSubmit={handleAddContact}
+                        validationSchema={schemaContacts}
+                        initialValues={{
+                            phoneNumber: "",
+                        }}
+                        render={({
+                                     handleSubmit,
+                                     handleChange,
+                                     values,
+                                     touched,
+                                     errors
+                                 }) => {
+                            return (
+                                <Form onSubmit={handleSubmit}>
+                                    <Form.Group className="mb-3" controlId="mark">
+                                        <Form.Label>Phone Number</Form.Label>
+                                        <Form.Control
+                                            onChange={handleChange}
+                                            name="phoneNumber"
+                                            type="text"
+                                            isValid={touched.phoneNumber && !errors.phoneNumber}/>
+                                        {errors.phoneNumber && touched.phoneNumber ? (
+                                            <div className="error"
+                                                 style={{color: "red"}}>{errors.phoneNumber}</div>) : null}
+                                    </Form.Group>
+
+                                    <Button type="submit">
+                                        <span>Submit</span>
+                                    </Button>
+                                </Form>);
+                        }}>
+                    </Formik>
+                </Modal.Body>
+            </Modal>
+
         </div>
     );
 };
 
-export default UserHome;
+export default AdvertisementItem;
