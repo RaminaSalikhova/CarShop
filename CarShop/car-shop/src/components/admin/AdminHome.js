@@ -4,7 +4,7 @@ import axios from "axios";
 import UserItem from "./UserItem";
 
 const AdminHome = () => {
-    const[token, setToken]=useState(localStorage.getItem("token"));
+    const[token, setToken]=useState(sessionStorage.getItem("token"));
     const[users, setUsers]=useState([]);
 
     useEffect(async ()=>{
@@ -25,12 +25,12 @@ const AdminHome = () => {
         <div>
             <h1>Hi, Admin</h1>
 
-            <h4>Advertisements</h4>
+            <h4 className="h4">Advertisements</h4>
             <div className="App">
                 <Pagination></Pagination>
             </div>
 
-            <h4>Users</h4>
+            <h4 className="h4">Users</h4>
             {users.map(user=> <UserItem token={token} user={user}></UserItem>)}
         </div>
     );

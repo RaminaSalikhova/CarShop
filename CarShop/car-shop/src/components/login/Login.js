@@ -12,9 +12,9 @@ const Login = (props) => {
         console.log(response.data)
 
         if (response.data !== undefined) {
-            localStorage.setItem("token", response.data.token)
-            localStorage.setItem("userId", response.data.userId)
-            localStorage.setItem("role", response.data.role)
+            sessionStorage.setItem("token", response.data.token)
+            sessionStorage.setItem("userId", response.data.userId)
+            sessionStorage.setItem("role", response.data.role)
             redirectToUserHome()
         }
     }
@@ -28,10 +28,10 @@ const Login = (props) => {
     }
 
     const redirectToUserHome = () => {
-        if (localStorage.getItem("role") === 'user') {
+        if (sessionStorage.getItem("role") === 'user') {
             props.history.push("/userHome");
 
-        } else if (localStorage.getItem("role") === 'admin') {
+        } else if (sessionStorage.getItem("role") === 'admin') {
             props.history.push("/adminHome");
         }
     }
