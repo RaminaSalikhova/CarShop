@@ -41,7 +41,7 @@ public class ContactController {
     @PostMapping(value = "/advertisements/{id}/contacts/",
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity addContact(@RequestParam("id") Long id, @RequestBody AddContactDto addContactDto) {
+    public ResponseEntity addContact(@PathVariable("id") Long id, @RequestBody AddContactDto addContactDto) {
         Optional<Advertisement> advertisement = Optional.ofNullable(advertisementService.findById(id));
         if(!ValidationUtil.validatePhoneNumber(addContactDto.getNumber())){
             return new ResponseEntity<>("No valid number", HttpStatus.BAD_REQUEST);

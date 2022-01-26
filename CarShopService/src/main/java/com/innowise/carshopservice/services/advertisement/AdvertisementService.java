@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class AdvertisementService extends CommonServiceImpl<Advertisement, AdvertisementRepo> {
@@ -24,6 +25,11 @@ public class AdvertisementService extends CommonServiceImpl<Advertisement, Adver
     public Page<Advertisement> filtration(Pageable pageable, String keyword){
         return repo.filtration(pageable,keyword);
     }
+
+    public List<Advertisement> findAllByUserId(Long userId){
+        return repo.findAllByUserUserId(userId);
+    }
+
 
     public Page<Advertisement> findAllByPage(Pageable pageable){ return repo.findAllByActivityStatus(pageable, ACTIVITY_STATUS.active);}
 }
