@@ -8,10 +8,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface AdvertisementRepo extends CommonRepository<Advertisement> {
     @Modifying
     @Query(value = "update Advertisement as u set u.activityStatus = 'deactivated' where u.advertisementId = :id")
     void softDelete(Long id);
+
+    List<Advertisement> findAllByUserUserId(Long userId);
 
     Page<Advertisement> findAllByActivityStatus(Pageable pageable, ACTIVITY_STATUS activityStatus);
 

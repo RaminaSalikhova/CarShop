@@ -128,6 +128,25 @@ public class AdvertisementController {
         return getAdvertisementDto;
     }
 
+    @GetMapping("/users/{id}/advertisements/")
+    public List<GetAdvertisementDto> getAdvertisementByUserId(@PathVariable("id") Long id) {
+        List<Advertisement> advertisements = advertisementService.findAllByUserId(id);
+        List<GetAdvertisementDto> getAdvertisementDtoList=new ArrayList<>();
+        for(Advertisement advertisement: advertisements) {
+            GetAdvertisementDto getAdvertisementDto = modelMapper.map(advertisement, GetAdvertisementDto.class);
+            getAdvertisementDto.setName(advertisement.getUser().getName());
+            List<Contact> contacts = contactService.findAllByAdvertisementId(advertisement.getAdvertisementId());
+            List<String> numbers = new ArrayList<>();
+            for (Contact el : contacts) {
+                numbers.add(el.getNumber());
+            }
+
+            getAdvertisementDto.setContact(numbers);
+            getAdvertisementDtoList.add(getAdvertisementDto);
+        }
+        return getAdvertisementDtoList;
+    }
+
     @PutMapping(value = "/advertisements/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -148,7 +167,7 @@ public class AdvertisementController {
             updateAdvertisement.setUser(user);
 
             Car car = modelMapper.map(updateAdvertisementDto, Car.class);
-            Optional<Car> foundCar=Optional.ofNullable(carService.findById(updateAdvertisementDto.getUserId()));
+            Optional<Car> foundCar=Optional.ofNullable(carService.findById(updateAdvertisementDto.getCarId()));
             if(foundCar.isEmpty()){
                 return new ResponseEntity<>("No such car", HttpStatus.BAD_REQUEST);
             }
