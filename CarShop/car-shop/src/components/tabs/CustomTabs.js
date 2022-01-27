@@ -10,7 +10,7 @@ const CustomTabs = (props) => {
         <div>
             <Tabs  id="uncontrolled-tab-example" className="mb-3">
                 <Tab eventKey="Store" title="Store" >
-                    <Pagination/>
+                    <Pagination history={props.history}/>
                 </Tab>
                 <Tab eventKey="SignIn" title="Sign in">
                     <Login history={props.history}/>

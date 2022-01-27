@@ -1,14 +1,21 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Form from 'react-bootstrap/Form'
 import Button from 'react-bootstrap/Button'
 import axios from "axios";
 import {Formik, Field, ErrorMessage} from 'formik';
 import * as yup from 'yup';
+import {Alert} from "react-bootstrap";
 
 const Login = (props) => {
 
+    const[error, setError]=useState(false);
+
     async function loginUser(obj) {
-        const response = await axios.post("http://localhost:8082/carshop/users/login", obj)
+        const response = (await axios.post("http://localhost:8082/carshop/users/login", obj)
+            .catch((error) => {
+                console.log('error: ' + error);
+                setError(true);
+            }));
         console.log(response.data)
 
         if (response.data !== undefined) {
@@ -16,6 +23,8 @@ const Login = (props) => {
             sessionStorage.setItem("userId", response.data.userId)
             sessionStorage.setItem("role", response.data.role)
             redirectToUserHome()
+        }else {
+            setError(true);
         }
     }
 
@@ -43,6 +52,10 @@ const Login = (props) => {
 
     return (
         <div>
+            {error ? <Alert variant='danger'>
+                    <Alert.Heading> Forbidden! Check your email and password</Alert.Heading></Alert> :
+                <div></div>
+            }
             <h1>Sign in</h1>
             <Formik
                 onSubmit={handleLogin}
