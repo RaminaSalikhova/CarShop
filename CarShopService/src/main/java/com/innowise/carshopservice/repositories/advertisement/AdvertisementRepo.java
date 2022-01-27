@@ -19,13 +19,15 @@ public interface AdvertisementRepo extends CommonRepository<Advertisement> {
 
     Page<Advertisement> findAllByActivityStatus(Pageable pageable, ACTIVITY_STATUS activityStatus);
 
-    @Query("SELECT p FROM Advertisement p WHERE p.car.model LIKE %?1%"
+    @Query("SELECT p FROM Advertisement p " +
+            "WHERE p.activityStatus='active' "
+            + "AND (p.car.model LIKE %?1%"
             + " OR p.car.mark LIKE %?1%"
             + " OR CONCAT(p.car.mileage, '')  LIKE %?1%"
             + " OR CONCAT(p.car.state, '')  LIKE %?1%"
             + " OR p.car.yearOfProduction LIKE %?1%"
             + " OR  CONCAT(p.cost.value, '')  LIKE %?1%"
-            + " OR  CONCAT(p.cost.currency, '')LIKE %?1%")
+            + " OR  CONCAT(p.cost.currency, '')LIKE %?1%)")
     Page<Advertisement> filtration(Pageable pageable, String keyword);
 
 }
