@@ -11,7 +11,12 @@ import ContactItem from "./ContactItem";
 const AdvertisementItem = (props) => {
     const [show, setShow] = useState(false);
 
-    const [reloadList, setReloadingList] = useState(false);
+    const [reloadContactList, setReloadingContactList] = useState(false);
+    const [contacts, setContacts] = useState([]);
+
+    useEffect(async () => {
+        await fetchContacts();
+    }, [reloadContactList]);
 
     const handleClose = () => setShow(false);
     const handleShow = async () => {
@@ -24,10 +29,7 @@ const AdvertisementItem = (props) => {
     const handleCloseContacts = () => setShowContacts(false);
     const handleShowContacts = async () => {
         setShowContacts(true);
-        fetchContacts();
     }
-
-    const [contacts, setContacts] = useState([]);
 
     async function fetchContacts() {
         let url = "http://localhost:8082/carshop/advertisements/" + props.advertisement.advertisementId + "/contacts/"
@@ -38,18 +40,16 @@ const AdvertisementItem = (props) => {
         });
         console.log(response.data);
         setContacts(response.data);
-        setReloadingList(!reloadList);
     }
 
     async function postContact(obj) {
-        let url = "http://localhost:8082/carshop/advertisements/"+ props.advertisement.advertisementId+"/contacts/";
+        let url = "http://localhost:8082/carshop/advertisements/" + props.advertisement.advertisementId + "/contacts/";
         const response = await axios.post(url, obj, {
             headers: {
                 "Authorization": `Bearer ${sessionStorage.getItem("token")}`
             }
         });
-        props.setReloadingList(!props.currentReloadState);
-        setReloadingList(!reloadList);
+        setReloadingContactList(!reloadContactList);
     }
 
 
@@ -61,7 +61,6 @@ const AdvertisementItem = (props) => {
             }
         });
         props.setReloadingList(!props.currentReloadState);
-
     }
 
     async function updateAdvertisement(obj) {
@@ -94,8 +93,8 @@ const AdvertisementItem = (props) => {
     const phoneRegExp = /^\+375(17|29|33|44)[0-9]{3}[0-9]{2}[0-9]{2}$/
 
     const handleAddContact = (e) => {
-        const obj={
-            number:e.phoneNumber,
+        const obj = {
+            number: e.phoneNumber,
         }
         console.log(obj);
         postContact(obj);
@@ -150,8 +149,6 @@ const AdvertisementItem = (props) => {
         {value: "2021", label: "2021"},
         {value: "2022", label: "2022"}
     ];
-
-    console.log(props);
 
     return (
         <div>
@@ -306,7 +303,7 @@ const AdvertisementItem = (props) => {
                                                  style={{color: "red"}}>{errors.currency}</div>) : null}
                                     </Form.Group>
 
-                                    <Button type="submit">
+                                    <Button type="submit" >
                                         <span>Submit</span>
                                     </Button>
                                 </Form>);
@@ -324,9 +321,9 @@ const AdvertisementItem = (props) => {
                     <h4 className="h4">Your contacts</h4>
                     {contacts.map(contact =>
                         <ContactItem contact={contact}
-                                     setReloadingList={setReloadingList}
-                                     currentReloadState={reloadList}
-                        ></ContactItem>
+                                     setReloadingContactList={setReloadingContactList}
+                                     reloadContactList={reloadContactList}
+                        />
                     )}
                     <Formik
                         onSubmit={handleAddContact}

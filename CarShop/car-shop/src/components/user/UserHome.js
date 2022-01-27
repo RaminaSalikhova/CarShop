@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
 import AdvertisementItem from "./AdvertisementItem";
-import {Modal} from "react-bootstrap";
+import {Modal, Navbar} from "react-bootstrap";
 import Carousel from "react-bootstrap/Carousel";
 import {Formik, Field, ErrorMessage} from "formik";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import * as yup from "yup";
+import {useHistory} from "react-router-dom";
 
 const UserHome = () => {
 
@@ -42,7 +43,7 @@ const UserHome = () => {
                 "Authorization": `Bearer ${sessionStorage.getItem("token")}`
             }
         });
-        // setAdvertisements(response.data);
+        setReloadingList(!reloadList);
     }
 
     const handleAdd = (e) => {
@@ -54,10 +55,19 @@ const UserHome = () => {
             mileage: e.mileage,
             value: e.cost,
             currency: e.currency,
-            userId:sessionStorage.getItem("userId")
+            userId: sessionStorage.getItem("userId")
         };
         console.log(obj)
         postAdvertisements(obj);
+    }
+
+    const history = useHistory();
+
+    const logout=()=>{
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('userId');
+        sessionStorage.removeItem('role');
+        history.push("/");
     }
 
     const schema = yup.object().shape({
@@ -108,22 +118,33 @@ const UserHome = () => {
 
     return (
         <div>
-            <h1>Hi, User</h1>
+                <Navbar bg="dark" variant="dark">
+                    <Navbar.Brand>
+                        <h1>Hi, User</h1>
+                    </Navbar.Brand>
+                    <Navbar.Toggle/>
+                    <Navbar.Collapse className="justify-content-end">
+                        <button onClick={logout} type="button" className="btn btn-dark" style={{margin: "3.5%"}}>
+                            Log out
+                        </button>
+                    </Navbar.Collapse>
+                </Navbar>
+
             <button onClick={handleShow} type="button" className="btn btn-dark" style={{margin: "3.5%"}}>Add
                 advertisement
             </button>
 
             <h4 className="h4">Your advertisements</h4>
             {advertisements.map(advertisement =>
-                advertisement.activityStatus=="deactivated"
+                advertisement.activityStatus == "deactivated"
                     ? null
                     :
-                <AdvertisementItem key={advertisement.advertisementId}
-                                                                    token={sessionStorage.getItem("token")}
-                                                                    advertisement={advertisement}
-                                                                    setReloadingList={setReloadingList}
-                                                                    currentReloadState={reloadList}
-            />)}
+                    <AdvertisementItem key={advertisement.advertisementId}
+                                       token={sessionStorage.getItem("token")}
+                                       advertisement={advertisement}
+                                       setReloadingList={setReloadingList}
+                                       currentReloadState={reloadList}
+                    />)}
 
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
@@ -190,7 +211,8 @@ const UserHome = () => {
                                         </Form.Control>
 
                                         {errors.yearofproduction && touched.yearofproduction ? (
-                                            <div className="error" style={{color:"red"}}>{errors.yearofproduction}</div>) : null}
+                                            <div className="error"
+                                                 style={{color: "red"}}>{errors.yearofproduction}</div>) : null}
                                     </Form.Group>
 
                                     <Form.Group className="mb-3" controlId="state">
@@ -206,7 +228,7 @@ const UserHome = () => {
                                             <option value={"unused"}>with unused</option>
                                         </Form.Control>
                                         {errors.state && touched.state ? (
-                                            <div className="error" style={{color:"red"}}>{errors.state}</div>) : null}
+                                            <div className="error" style={{color: "red"}}>{errors.state}</div>) : null}
                                     </Form.Group>
 
                                     <Form.Group className="mb-3" controlId="mileage">
@@ -242,11 +264,12 @@ const UserHome = () => {
                                                       isValid={touched.currency && !errors.currency}>
                                             <option>Open this select menu</option>
                                             <option value={"EUR"}>EUR</option>
-                                            <option value={"BYR"}>BYR</option>
+                                            <option value={"BYN"}>BYN</option>
                                             <option value={"USD"}>USD</option>
                                         </Form.Control>
                                         {errors.currency && touched.currency ? (
-                                            <div className="error" style={{color:"red"}}>{errors.currency}</div>) : null}
+                                            <div className="error"
+                                                 style={{color: "red"}}>{errors.currency}</div>) : null}
                                     </Form.Group>
 
                                     <Button type="submit">

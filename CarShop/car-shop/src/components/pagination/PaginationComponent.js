@@ -3,21 +3,14 @@ import Pagination from "react-js-pagination";
 
 const PaginationComponent = (props) => {
 
-    // const [totalRecords, setTotalRecords] = useState(0);
-    const [activePage, setActivePage] = useState(1);
-    // const [limit, setLimit] = useState(2);
-
+    // const [activePage, setActivePage] = useState(1);
 
     const handlePageChange = (e) => {
-        setActivePage(e);
-        props.getAllData(e-1);
+        props.setActivePage(e-1);
+        // props.getAllData(e-1);
         console.log( e-1);
         props.setReloadingList(!props.currentReloadState);
     };
-
-    // useEffect(async () => {
-    //     setTotalRecords(props.totalRecords)
-    // })
 
     return (
         <div className="pagination-wrapper" style={{marginLeft: "30%"}}>
@@ -29,7 +22,7 @@ const PaginationComponent = (props) => {
                 nextPageText="Next"
                 firstPageText="First"
                 lastPageText="Last"
-                activePage={activePage}
+                activePage={props.activePage}
                 itemsCountPerPage={props.itemsCountPerPage}
                 totalItemsCount={props.totalRecords}
                 onChange={handlePageChange}

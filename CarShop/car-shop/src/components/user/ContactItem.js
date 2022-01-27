@@ -11,7 +11,7 @@ const ContactItem = (props) => {
                 "Authorization": `Bearer ${sessionStorage.getItem("token")}`
             }
         });
-        props.setReloadingList(!props.currentReloadState);
+        props.setReloadingContactList(!props.reloadContactList);
     }
 
     return (
